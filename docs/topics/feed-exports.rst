@@ -207,6 +207,7 @@ These are the settings used for configuring the feed exports:
  * :setting:`FEED_STORAGES`
  * :setting:`FEED_EXPORTERS`
  * :setting:`FEED_STORE_EMPTY`
+ * :setting:`FEED_EXPORT_ENCODING`
  * :setting:`FEED_EXPORT_FIELDS`
 
 .. currentmodule:: scrapy.extensions.feedexport
@@ -230,6 +231,20 @@ FEED_FORMAT
 
 The serialization format to be used for the feed. See
 :ref:`topics-feed-format` for possible values.
+
+.. setting:: FEED_EXPORT_ENCODING
+
+FEED_EXPORT_ENCODING
+--------------------
+
+Default: ``None``
+
+The encoding to be used for the feed.
+
+If unset or set to ``None`` (default) it uses UTF-8 for everything except JSON output,
+which uses safe numeric encoding (``\uXXXX`` sequences) for historic reasons.
+
+Use ``utf-8`` if you want UTF-8 for JSON too.
 
 .. setting:: FEED_EXPORT_FIELDS
 
@@ -265,7 +280,7 @@ Whether to export empty feeds (ie. feeds with no items).
 FEED_STORAGES
 -------------
 
-Default:: ``{}``
+Default: ``{}``
 
 A dict containing additional feed storage backends supported by your project.
 The keys are URI schemes and the values are paths to storage classes.
@@ -299,7 +314,7 @@ can disable any of these backends by assigning ``None`` to their URI scheme in
 FEED_EXPORTERS
 --------------
 
-Default:: ``{}``
+Default: ``{}``
 
 A dict containing additional exporters supported by your project. The keys are
 serialization formats and the values are paths to :ref:`Item exporter

@@ -299,6 +299,7 @@ Those are:
 * :reqmeta:`dont_obey_robotstxt`
 * :reqmeta:`download_timeout`
 * :reqmeta:`download_maxsize`
+* :reqmeta:`download_latency`
 * :reqmeta:`proxy`
 
 .. reqmeta:: bindaddress
@@ -316,6 +317,15 @@ download_timeout
 The amount of time (in secs) that the downloader will wait before timing out.
 See also: :setting:`DOWNLOAD_TIMEOUT`.
 
+.. reqmeta:: download_latency
+
+download_latency
+----------------
+
+The amount of time spent to fetch the response, since the request has been
+started, i.e. HTTP message sent over the network. This meta key only becomes
+available when the response has been downloaded. While most other meta keys are
+used to control Scrapy behavior, this one is supposed to be read-only.
 
 .. _topics-request-response-ref-request-subclasses:
 
@@ -463,7 +473,7 @@ method for this job. Here's an example spider which uses it::
 Response objects
 ================
 
-.. class:: Response(url, [status=200, headers, body, flags])
+.. class:: Response(url, [status=200, headers=None, body=b'', flags=None, request=None])
 
     A :class:`Response` object represents an HTTP response, which is usually
     downloaded (by the Downloader) and fed to the Spiders for processing.
@@ -471,12 +481,12 @@ Response objects
     :param url: the URL of this response
     :type url: string
 
+    :param status: the HTTP status of the response. Defaults to ``200``.
+    :type status: integer
+
     :param headers: the headers of this response. The dict values can be strings
        (for single valued headers) or lists (for multi-valued headers).
     :type headers: dict
-
-    :param status: the HTTP status of the response. Defaults to ``200``.
-    :type status: integer
 
     :param body: the response body. It must be str, not unicode, unless you're
        using a encoding-aware :ref:`Response subclass
@@ -484,14 +494,14 @@ Response objects
        :class:`TextResponse`.
     :type body: str
 
-    :param meta: the initial values for the :attr:`Response.meta` attribute. If
-       given, the dict will be shallow copied.
-    :type meta: dict
-
     :param flags: is a list containing the initial values for the
        :attr:`Response.flags` attribute. If given, the list will be shallow
        copied.
     :type flags: list
+
+    :param request: the initial value of the :attr:`Response.request` attribute.
+        This represents the :class:`Request` that generated this response.
+    :type request: :class:`Request` object
 
     .. attribute:: Response.url
 
@@ -507,7 +517,13 @@ Response objects
 
     .. attribute:: Response.headers
 
-        A dictionary-like object which contains the response headers.
+        A dictionary-like object which contains the response headers. Values can
+        be accessed using :meth:`get` to return the first header value with the
+        specified name or :meth:`getlist` to return all header values with the
+        specified name. For example, this call will give you all cookies in the
+        headers::
+
+            response.headers.getlist('Set-Cookie')
 
     .. attribute:: Response.body
 
